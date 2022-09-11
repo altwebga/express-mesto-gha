@@ -1,22 +1,27 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    minlength: 2,
-    maxlength: 30,
-    default: 'Жак-Ив Кусто',
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      minlength: 2,
+      maxlength: 30,
+    },
+    about: {
+      type: String,
+      required: true,
+      minlength: 2,
+      maxlength: 30,
+    },
+    avatar: {
+      type: String,
+      required: true,
+    },
   },
-  about: {
-    type: String,
-    minlength: 2,
-    maxlength: 30,
-    default: 'Исследователь',
+  {
+    versionKey: false,
   },
-  avatar: {
-    type: String,
-    default: 'https://mir-s3-cdn-cf.behance.net/projects/max_808/e87d6373015979.Y3JvcCwxOTk5LDE1NjQsMCwyMDc.png',
-  }
-});
+);
 
 module.exports = mongoose.model('user', userSchema);
