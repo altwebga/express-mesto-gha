@@ -3,11 +3,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
-const NotFoundError = require('./errors/notFoundError');
+const NotFoundError = require('./errors/notFoundError404');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-
-const patternUrl = /http(s?):\/\/(www\.)?[0-9a-zA-Z-]+\.[a-zA-Z]+([0-9a-zA-Z-._~:/?#[\]@!$&'()*+,;=]+)/;
+const { urlPattern } = require('./pattern/urlPattern');
 
 const { PORT = 3000 } = process.env;
 
@@ -25,7 +24,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(patternUrl),
+    avatar: Joi.string().regex(urlPattern),
   }),
 }), createUser);
 
@@ -60,5 +59,6 @@ app.use((error, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен. Порт:${PORT}`);
+  // eslint-disable-next-line no-console
+  console.log(`Сервер запущен. Порт: ${PORT}`);
 });

@@ -7,8 +7,7 @@ const {
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
-
-const urlPattern = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/;
+const { urlPattern } = require('../pattern/urlPattern');
 
 router.get('/', getAllCards);
 

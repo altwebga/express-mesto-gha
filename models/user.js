@@ -1,22 +1,21 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const UnauthorizedError = require('../errors/unauthorizedError');
-
-const urlPattern = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/;
+const UnauthorizedError = require('../errors/unauthorizedError401');
+const { urlPattern } = require('../pattern/urlPattern');
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      minlength: [2, 'Имя должно быть длиннее 2х символов, сейчас его длина {VALUE} символ(ов)'],
-      maxlength: [30, 'Имя должно быть короче 30ти символов, сейчас его длина {VALUE} символ(ов)'],
+      minlength: [2, 'Имя должно быть длиннее 2-х символов, текущая длина {VALUE}'],
+      maxlength: [30, 'Имя должно быть короче 30-ти символов, текущая длина {VALUE}'],
       default: 'Жак-Ив Кусто',
     },
     about: {
       type: String,
-      minlength: [2, 'Описание должно быть длиннее 2х символов, сейчас его длина {VALUE} символ(ов)'],
-      maxlength: [30, 'Описание должно быть короче 30ти символов, сейчас его длина {VALUE} символ(ов)'],
+      minlength: [2, 'Описание должно быть длиннее 2-х символов, текущая длина {VALUE}'],
+      maxlength: [30, 'Описание должно быть короче 30-ти символов, текущая длина {VALUE}'],
       default: 'Исследователь',
     },
     avatar: {
@@ -25,9 +24,9 @@ const userSchema = new mongoose.Schema(
         validator(url) {
           return urlPattern.test(url);
         },
-        message: 'Некорректная ссылка',
+        message: 'Некорректный url',
       },
-      default: 'https://alasnome.com/uploads/358.jpg',
+      default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
     email: {
       type: String,
@@ -37,7 +36,7 @@ const userSchema = new mongoose.Schema(
         validator(email) {
           return validator.isEmail(email);
         },
-        message: 'Некорректный адрес электронной почты',
+        message: 'Некорректный Email',
       },
     },
     password: {
@@ -52,6 +51,7 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+// eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select('+password')

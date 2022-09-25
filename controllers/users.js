@@ -2,10 +2,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const NotFoundError = require('../errors/notFoundError');
-const ValidationError = require('../errors/validationError');
-const ConflictError = require('../errors/conflictError');
-const UnauthorizedError = require('../errors/unauthorizedError');
+const NotFoundError = require('../errors/notFoundError404');
+const ValidationError = require('../errors/validationError400');
+const ConflictError = require('../errors/conflictError409');
+const UnauthorizedError = require('../errors/unauthorizedError401');
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
@@ -130,7 +130,7 @@ module.exports.login = (req, res, next) => {
       if (!token) {
         next(new UnauthorizedError('401 - Ошибка при создании токена'));
       }
-      res.cookie('jwt', token, { maxAge: 3600 * 24 * 7, httpOnly: true }).send({
+      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({
         _id: user._id,
         name: user.name,
         about: user.about,

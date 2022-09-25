@@ -1,8 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-
-const urlPattern = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/;
-
+const { urlPattern } = require('../pattern/urlPattern');
 const {
   getAllUsers,
   getUserById,
