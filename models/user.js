@@ -1,27 +1,72 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const UnauthorizedError = require('../errors/unauthorizedError');
+
+const urlPattern = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/;
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 30,
+      minlength: [2, 'Имя должно быть длиннее 2х символов, сейчас его длина {VALUE} символ(ов)'],
+      maxlength: [30, 'Имя должно быть короче 30ти символов, сейчас его длина {VALUE} символ(ов)'],
+      default: 'Жак-Ив Кусто',
     },
     about: {
       type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 30,
+      minlength: [2, 'Описание должно быть длиннее 2х символов, сейчас его длина {VALUE} символ(ов)'],
+      maxlength: [30, 'Описание должно быть короче 30ти символов, сейчас его длина {VALUE} символ(ов)'],
+      default: 'Исследователь',
     },
     avatar: {
       type: String,
+      validate: {
+        validator(url) {
+          return urlPattern.test(url);
+        },
+        message: 'Некорректная ссылка',
+      },
+      default: 'https://alasnome.com/uploads/358.jpg',
+    },
+    email: {
+      type: String,
       required: true,
+      unique: true,
+      validate: {
+        validator(email) {
+          return validator.isEmail(email);
+        },
+        message: 'Некорректный адрес электронной почты',
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+      minlength: 8,
     },
   },
   {
     versionKey: false,
   },
 );
+
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new UnauthorizedError('401 - Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new UnauthorizedError('401 - Неправильные почта или пароль'));
+          }
+          return user;
+        });
+    });
+};
 
 module.exports = mongoose.model('user', userSchema);
