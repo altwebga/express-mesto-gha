@@ -130,7 +130,7 @@ module.exports.login = (req, res, next) => {
       if (!token) {
         next(new UnauthorizedError('401 - Ошибка при создании токена'));
       }
-      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({
+      res.cookie('jwt', token, { maxAge: 3600 * 24 * 7, httpOnly: true }).send({
         _id: user._id,
         name: user.name,
         about: user.about,
