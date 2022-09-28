@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const { urlPattern } = require('../pattern/urlPattern');
+
 const cardSchema = new mongoose.Schema(
   {
     name: {
@@ -11,6 +13,12 @@ const cardSchema = new mongoose.Schema(
     link: {
       type: String,
       required: true,
+      validate: {
+        validator(url) {
+          return urlPattern.test(url);
+        },
+        message: 'Некорректный url',
+      },
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +27,6 @@ const cardSchema = new mongoose.Schema(
     },
     likes: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'user',
       default: [],
     },
     createdAt: {

@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-
 const NotFoundError = require('../errors/notFoundError404');
 const ValidationError = require('../errors/validationError400');
 const ConflictError = require('../errors/conflictError409');
@@ -94,10 +93,6 @@ module.exports.updateUserProfile = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('400 - Переданы некорректные данные при обновлении профиля'));
-        return;
-      }
-      if (err.name === 'CastError') {
-        next(new NotFoundError(`404 - Пользователь с указанным _id: ${req.user._id} не найден`));
         return;
       }
       next(err);
